@@ -1,7 +1,8 @@
 /*
-  Title: lives.js
-  Description:
-  In this version of the code, we are going to give our player multiple lives
+  Title: staticsun.js
+
+  In this version of the code, we add a static object to the screen, in this case the sun
+  You can change this to any object you like.
 */
 
 /* GLOBAL STATE VARIABLES START WITH A __ */
@@ -11,8 +12,7 @@ var _scoreDisplay = "";
 var _gameStartTime = (new Date()).getTime();
 var _timeLeftDisplay = "";
 var _secondsTotal = 120;
-var _livesDisplay = "";
-
+/** ADD THIS **/
 var _tileMap = [
   {
     "level": 1,
@@ -40,12 +40,13 @@ var _tileMap = [
       [[1,48]]
     ]
   }
-];
+]
+
+/** END **/
 
 /* State */
 var __STATE = {};
 __STATE.level = 1;
-__STATE.numLives = 3;
 __STATE.gameStarted = false;
 __STATE.gameOver = false;
 __STATE.timeLeft = _secondsTotal;
@@ -60,7 +61,6 @@ const EVENT_PLAYER_DIE = "EVENT_PLAYER_DIE";
 const EVENT_PLAYER_HIT_WALKER = "EVENT_PLAYER_HIT_WALKER";
 const EVENT_PLAYER_HIT_WALL = "EVENT_PLAYER_HIT_WALL";
 const EVENT_GAME_OVER = "EVENT_GAME_OVER";
-const EVENT_RESPAWN = "EVENT_RESPAWN";
 const EVENT_LEVEL_COMPLETE = "EVENT_LEVEL_COMPLETE";
 const SCREENWIDTH = 800;
 const SCREENHEIGHT = 600;
@@ -182,7 +182,8 @@ function spawnPlayer (){
     .bind('Moved', function (obj) {
       if (this.x >= (SCREENWIDTH / 2) && this.x <= 3440) {
         Crafty.viewport.scroll('_x', (this.x - (SCREENWIDTH / 2)) * -1);
-        displayText();
+        displayScore();
+        displayTimeLeft();
       }
     })
     .bind('CheckJumping', function (ground) {
@@ -208,7 +209,8 @@ function spawnPlayer (){
         this.canJump = false;
       }
       this.pauseAnimation();
-      this.resetAnimation();      
+      this.resetAnimation();
+      //this.animate('jump', 1)
       this.sprite(this.currentDirection === RIGHT ? 6 : 2, 4);
     })
     .bind('LandedOnGround', function (ground) {
@@ -225,6 +227,7 @@ function spawnPlayer (){
         this.inDoubleJumpMode = false;
       }
       /* Will need to enable controls in some circumstances */
+      console.log('Enabling control2...');
       if(!__STATE.levelComplete){
         this.enableControl();
       }
@@ -266,14 +269,7 @@ function spawnPlayer (){
     })
     .bind(EVENT_PLAYER_DIE, function () {
       this.tween({ alpha: 0.0 }, 1000);
-
-      /* Is this GAME OVER ?? */
-      if(--__STATE.numLives === 0){
-        Crafty.trigger(EVENT_GAME_OVER);
-      }
-      else{
-        Crafty.trigger(EVENT_RESPAWN);
-      }
+      Crafty.trigger(EVENT_GAME_OVER);
     })
     .bind(EVENT_PLAYER_HIT_WALKER, function () {
       this.vy = -400;
@@ -285,7 +281,7 @@ function spawnPlayer (){
     .bind('EnterFrame', function(){
       if(this.x <= -6) this.x = -5;
       if(this.x >= 3785) this.x = 3784;
-    });
+    })
 
     /* Set player defaults */
     _player.isJumping = false;
@@ -364,18 +360,16 @@ function processMap(tempMap){
 function displayText () {
   displayScore();
   displayTimeLeft();
-  displayLivesLeft();
 }
 
-function displayLivesLeft () {
-  if(_livesDisplay){
-    _livesDisplay.destroy();
+function displaySun () {
+  if(Crafty("Sun")){
+    Crafty("Sun").destroy();
   }
-  _livesDisplay = Crafty.e("2D, DOM, Text")
-    .attr({ x: 20 - Crafty.viewport._x, y: 20 })
-    .text(__STATE.numLives)
-    .textColor('#000000')
-    .textFont({ size: '14px', weight: 'bold', family: 'Courier New' });
+
+  Crafty.e('Sun, 2D, DOM, Image')
+    .attr({ x: 650 - Crafty.viewport._x, y: 50, z: 0, w: 100, h: 105 })
+    .image(Crafty.assets['img/sun.png'].src);
 }
 
 function displayTimeLeft () {
@@ -385,7 +379,7 @@ function displayTimeLeft () {
   _timeLeftDisplay = Crafty.e("2D, DOM, Text")
     .attr({ x: 720 - Crafty.viewport._x, y: 20 })
     .text(__STATE.timeLeft)
-    .textColor('#F2C365')
+    .textColor('#FF0000')
     .textFont({ size: '14px', weight: 'bold', family: 'Courier New' });
 }
 
@@ -431,34 +425,11 @@ function pad(num, size) {
 
 function setupGlobalBindings () {
   Crafty.bind(EVENT_GAME_OVER, function(){
-    __STATE.gameOver = true;
     _player.disableControl();
     pauseAndResetAnimation(_player);
     _player.destroy();
     displayGameOver();
-  });
-
-  Crafty.bind(EVENT_RESPAWN, function(){
-    pauseAndResetAnimation(_player);
-    _player.destroy();
-
-    _player = null;
-    _viewportX = 0;
-    _gameStartTime = (new Date()).getTime();
-
-    __STATE.gameOver = false;
-    __STATE.timeLeft = _secondsTotal;
-    __STATE.currentScore = __STATE.level === 1 ? 0 : __STATE.currentScore;
-    __STATE.gameOverIsDisplaying = false;
-    __STATE.numCoinsToCollect = 0;
-    __STATE.levelComplete = false;
-
-    /* Position viewport */
-    Crafty.viewport.scroll('_x', 0);
-
-    /* Respawn Player */
-    spawnPlayer();
-  });
+  })
 }
 
 function pauseAndResetAnimation (ent){
@@ -478,7 +449,7 @@ function reset () {
   _viewportX = 0;
   _scoreDisplay = __STATE.level === 1 ? "" : _scoreDisplay;
   _gameStartTime = (new Date()).getTime();
-  _timeLeftDisplay = null;
+  _timeLeftDisplay = "";
   _secondsTotal = 125 - __STATE.level * 5;
 
   __STATE.gameStarted = false;
@@ -490,12 +461,15 @@ function reset () {
   __STATE.levelComplete = false;
 
   /* Position viewport */
-  Crafty.viewport.scroll('_x', 0);
+  Crafty.viewport.scroll('_x', 0)
 }
 
 Crafty.bind('EnterFrame', function(){
-  if(!__STATE.gameStarted || __STATE.levelComplete || __STATE.gameOver)
+  if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
+
+  /* Display Sun */
+  displaySun();
 
   if(Crafty.frame() % 50 === 1){
     __STATE.timeLeft = _secondsTotal - Math.round(((new Date()).getTime() - _gameStartTime) / 1000);
@@ -509,11 +483,9 @@ Crafty.bind('EnterFrame', function(){
     __STATE.gameOverIsDisplaying = true;
   }
   if(!__STATE.gameOver){
-    displayScore();
     displayTimeLeft();
-    displayLivesLeft();
   }
-});
+})
 
 Crafty.bind(EVENT_LEVEL_COMPLETE, function(){
   console.log('Level Complete...');
@@ -527,4 +499,4 @@ Crafty.bind(EVENT_LEVEL_COMPLETE, function(){
     ++__STATE.level;
     initialiseGame();
   }, 2000, 0);
-});
+})

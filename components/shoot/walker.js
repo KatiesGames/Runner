@@ -76,7 +76,19 @@ Crafty.c('Walker', {
         this.destroy();
         Crafty.trigger(EVENT_PLAYER_DIE);
       }
+    })
+    .onHit('Bullet', function(o) {
+      for (var i = 0; i < o.length; i++) {
+          o[i].obj.trigger("explode");
+      }
+      this.trigger("explode");
+      this.velocity().x = 0;
+      this.tween({alpha: 0}, 250);
+      this.bind('TweenEnd', function(){
+        this.destroy();
+      });
     });
+
     this.bind('EnterFrame', function(){
       if(this.y > 700){
         this.destroy();
