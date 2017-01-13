@@ -1,14 +1,46 @@
 /*
-  Title: game-08.js
-  Description: In this version of the code, we are going to give our
-               player a death sequence when he is hit.
+  Title: game-10.js
+  Description: In this version of the code,
+               we are going to create a second level
+*/
 
-*/var _player = null;
+/* GLOBAL STATE VARIABLES START WITH A __ */
+var _player = null;
 var _viewportX = 0;
 var _scoreDisplay = "";
 var _gameStartTime = (new Date()).getTime();
 var _timeLeftDisplay = "";
 var _secondsTotal = 120;
+var _numLives = 3;
+
+var _tileMap = [
+  {
+    "level": 1,
+    "map": [
+      [[0,1],[0, 8],[0,13],[0,4],[0,8],[0, 8],[0,5],[0,4],[0,5],[0, 8]],
+      [[0,8],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,23]],
+      [[0,8],[0,19],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,4]],
+      [[0,11],[0,4],[0,12],[0,4],[0,14],[0,6]],
+      [[0,16],[0, 8],[0,13],[0, 8],[0,11]],
+      [[4,1],[0,9],[0,37]],
+      [[0,48]],
+      [[1,48]]
+    ]
+  },
+  {
+    "level": 2,
+    "map": [
+      [[4,1],[0,1],[0,12],[0,1],[0,8],[0,1],[0,5],[0,1],[0,5],[0,1]],
+      [[0,8],[0,1],[0,3],[0,1],[0,6],[0,1],[0,23]],
+      [[0,8],[0,19],[0,1],[0,3],[0,1],[0,6],[0,1],[0,4]],
+      [[0,11],[0,1],[0,12],[0,1],[0,14],[0,6]],
+      [[0,16],[8,1],[0,13],[8,1],[0,11]],
+      [[0,9],[4,1],[0,37]],
+      [[0,48]],
+      [[1,48]]
+    ]
+  }
+]
 
 /* State */
 var __STATE = {};
@@ -18,7 +50,8 @@ __STATE.gameOver = false;
 __STATE.timeLeft = _secondsTotal;
 __STATE.currentScore = 0;
 __STATE.gameOverIsDisplaying = false;
-__STATE.numCoinsToCollect = -1;
+__STATE.numCoinsToCollect = 0;
+__STATE.levelComplete = false;
 
 const PLAYER_SPEED = 4;
 const WALKER_VELOCITY = -80;
@@ -26,7 +59,7 @@ const EVENT_PLAYER_DIE = "EVENT_PLAYER_DIE";
 const EVENT_PLAYER_HIT_WALKER = "EVENT_PLAYER_HIT_WALKER";
 const EVENT_PLAYER_HIT_WALL = "EVENT_PLAYER_HIT_WALL";
 const EVENT_GAME_OVER = "EVENT_GAME_OVER";
-
+const EVENT_LEVEL_COMPLETE = "EVENT_LEVEL_COMPLETE";
 const SCREENWIDTH = 800;
 const SCREENHEIGHT = 600;
 const TILE_WIDTH = 80;
@@ -36,23 +69,11 @@ const RIGHT = 0;
 const LEFT = 1;
 const NONE = 2;
 
-var _player = null;
-
-var tileMap = [
-  [[0,1],[8,1],[0,13],[4,1],[0,8],[8,1],[0,5],[4,1],[0,7],[8,1],[0,6],[8,1],[0,2]],
-  [[0,8],[4,1],[0,3],[4,1],[0,6],[8,1],[0,28]],
-  [[0,8],[0,24],[4,1],[0,3],[4,1],[0,6],[8,1],[0,4]],
-  [[0,11],[4,1],[0,15],[4,1],[0,13],[4,1],[0,6]],
-  [[0,16],[8,1],[0,19],[8,1],[0,11]],
-  [[0,9],[4,1],[0,38]],
-  [[0,48]],
-  [[1,48]]
-];
-
 Crafty.init(800, 600, document.getElementById('gamecanvas'));
+
 setupGlobalBindings();
 
-var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png']};
+var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png', 'img/sun.png']};
 var playerSprite = { 'sprites': { 'img/playerSprite.png': { tile: 50, tileh: 77, map: { man_left: [0, 1], man_right: [0, 2], jump_right: [6, 4] } } } };
 
 initialiseGame();
@@ -72,13 +93,26 @@ function initialiseGame () {
 }
 
 function loadBackground () {
-  Crafty.background('#3BB9FF');
+  var bgColor = shade('#3BB9FF', __STATE.level * 4);
+  //Crafty.background(bgColor);
   //Crafty.background('#FFFFFF url(img/bg.png) repeat-x center center');
+  Crafty.e('BG, 2D, DOM, Image')
+    .attr({ x: 0, y: 0, z: 0, w:3840, h:600 })
+    .image('img/bg.png', 'repeat-x');
+}
+
+function shade(color, percent){
+    if (color.length > 7 ) return shadeRGBColor(color,percent);
+    else return shadeColor2(color,percent);
+}
+
+function shadeColor2(color, percent) {
+    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
 }
 
 function loadSprites () {
   Crafty.load(playerSprite);
-  Crafty.load(walkerSprite);
 }
 
 function spawnEntities () {
@@ -99,6 +133,9 @@ function spawnPlayer (){
     .gravityConst(GRAVITY_STRENGTH)
     .bind('KeyDown',
       function (e) {
+        if(__STATE.levelComplete)
+          return;
+
         if (Crafty.keydown['37'] && Crafty.keydown['39']) {
           this.pauseAnimation();
           this.resetAnimation();
@@ -116,6 +153,9 @@ function spawnPlayer (){
     )
     .bind('KeyUp',
       function (e) {
+        if(__STATE.levelComplete)
+          return;
+
         if ((this.isPlaying('moveRight') && e.key === Crafty.keys.RIGHT_ARROW) ||
           (this.isPlaying('moveLeft') && e.key === Crafty.keys.LEFT_ARROW)) {
           this.pauseAnimation();
@@ -185,7 +225,9 @@ function spawnPlayer (){
         this.inDoubleJumpMode = false;
       }
       /* Will need to enable controls in some circumstances */
-      this.enableControl();
+      if(!__STATE.levelComplete){
+        this.enableControl();
+      }
     })
     .bind('NewDirection', function (obj) {
       /* 0 is neither right nor left so we don't care about it */
@@ -210,7 +252,6 @@ function spawnPlayer (){
     })
     .checkHits('Platform')
     .bind('HitOn', function(hitData){
-      console.log('Hit Platform:', 'x:', hitData[0].obj.x, 'y:', hitData[0].obj.y, 'PlayerX:', this.x, 'PlayerY:', this.y);
       /* If underneath player, bounce back down */
       this.disableControl();
       this.gravityConst(1000);
@@ -230,6 +271,9 @@ function spawnPlayer (){
     .bind(EVENT_PLAYER_HIT_WALKER, function () {
       this.vy = -400;
       this.tween({ y: this.y - 100 }, 300);
+    })
+    .bind(EVENT_LEVEL_COMPLETE, function () {
+      this.disableControl();
     })
     .bind('EnterFrame', function(){
       if(this.x <= -6) this.x = -5;
@@ -253,9 +297,25 @@ function spawnWalker () {
   Crafty.e('Walker');
 }
 
+/*
+  The tilemap generation. Tile level maps are 'pulled' from the tilemap.json
+  file which is in the 'runner' directory. You can add as many levels as you
+  want.
+*/
 function generateMap () {
-  const Y_OFFSET = 600 - (tileMap.length * TILE_HEIGHT);
-  tileMap.map(function (tileRow, rowIdx) {
+  _tileMap.map(function(lv, idx){
+    if(lv.level === __STATE.level){
+      var tempMap = lv.map;
+      tempMap = lv.map;
+      processMap(tempMap);
+      return;
+    }
+  });
+}
+
+function processMap(tempMap){
+  const Y_OFFSET = 600 - (tempMap.length * TILE_HEIGHT);
+  tempMap.map(function (tileRow, rowIdx) {
     var xPos = 0;
     var yPos = 0;
     tileRow.map(function (tile, tileIdx) {
@@ -279,15 +339,17 @@ function generateMap () {
             .setImage('img/platform.png')
             .setPlatform(xPos, yPos, 1)
             .addCoins(Crafty.math.randomInt(1,2));
+            xPos += 160;
         }
         else if (tileType === 8) {
           Crafty.e('Platform')
             .setImage('img/platformx2.png')
             .setPlatform(xPos, yPos, 2)
             .addCoins(Crafty.math.randomInt(1,2));
+          xPos += 320;
         }
-        xPos += 80;
       }
+      if(rowIdx === 6) console.log('x:',xPos,'y:',yPos);
     });
   });
 }
@@ -334,7 +396,7 @@ function displayLevelComplete(){
 
   Crafty.e("LevelComplete, 2D, DOM, Text")
     .attr({ x: 270 - Crafty.viewport._x, y: 280, z:100, w: 350 })
-    .text("LEVEL COMPLETE").textColor('#33FF33').textFont({ size: '36px', weight: 'bold', family: 'Courier New' });
+    .text("LEVEL "+__STATE.level+" COMPLETE").textColor('#33FF33').textFont({ size: '36px', weight: 'bold', family: 'Courier New' });
 }
 
 function updateScore(amt){
@@ -352,6 +414,7 @@ function setupGlobalBindings () {
   Crafty.bind(EVENT_GAME_OVER, function(){
     _player.disableControl();
     pauseAndResetAnimation(_player);
+    _player.destroy();
     displayGameOver();
   })
 }
@@ -362,39 +425,62 @@ function pauseAndResetAnimation (ent){
 }
 
 function reinstateMovement () {
-  _player.enableControl();
+  console.log('Enabling controls...');
+  if(!__STATE.levelComplete){
+    _player.enableControl();
+  }
 }
 
 function reset () {
   _player = null;
   _viewportX = 0;
-  _scoreDisplay = "";
+  _scoreDisplay = __STATE.level === 1 ? "" : _scoreDisplay;
   _gameStartTime = (new Date()).getTime();
   _timeLeftDisplay = "";
-  _secondsTotal = 120;
+  _secondsTotal = 125 - __STATE.level * 5;
 
   __STATE.gameStarted = false;
   __STATE.gameOver = false;
   __STATE.timeLeft = _secondsTotal;
-  __STATE.currentScore = 0;
+  __STATE.currentScore = __STATE.level === 1 ? 0 : __STATE.currentScore;
   __STATE.gameOverIsDisplaying = false;
-  __STATE.numCoinsToCollect = -1;
+  __STATE.numCoinsToCollect = 0;
+  __STATE.levelComplete = false;
 
   /* Position viewport */
   Crafty.viewport.scroll('_x', 0)
 }
 
 Crafty.bind('EnterFrame', function(){
-  if(__STATE.gameStarted === false)
+  if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
 
   if(Crafty.frame() % 50 === 1){
     __STATE.timeLeft = _secondsTotal - Math.round(((new Date()).getTime() - _gameStartTime) / 1000);
-    displayTimeLeft();
+    if(__STATE.timeLeft <= -1){
+      __STATE.gameOver = true;
+    }
   }
   if(__STATE.gameOver && !__STATE.gameOverIsDisplaying){
     /* Display Game Over */
     Crafty.trigger(EVENT_GAME_OVER);
     __STATE.gameOverIsDisplaying = true;
   }
+  if(!__STATE.gameOver){
+    displayTimeLeft();
+  }
+})
+
+Crafty.bind(EVENT_LEVEL_COMPLETE, function(){
+  console.log('Level Complete...');
+  __STATE.levelComplete = true;
+  displayLevelComplete();
+  Crafty.e("Delay").delay(function(){
+    /* Destroy everything */
+    Crafty("2D").each(function(i) {
+      this.destroy();
+    });
+    ++__STATE.level;
+    initialiseGame();
+  }, 2000, 0);
 })

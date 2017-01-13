@@ -11,7 +11,7 @@ var _scoreDisplay = "";
 var _gameStartTime = (new Date()).getTime();
 var _timeLeftDisplay = "";
 var _secondsTotal = 120;
-/** ADD THIS **/
+
 var _tileMap = [
   {
     "level": 1,
@@ -41,8 +41,6 @@ var _tileMap = [
   }
 ]
 
-/** END **/
-
 /* State */
 var __STATE = {};
 __STATE.level = 1;
@@ -70,23 +68,6 @@ const RIGHT = 0;
 const LEFT = 1;
 const NONE = 2;
 
-/** REMOVE THIS **/
-var _player = null;
-/** END **/
-
-/** REMOVE THIS **/
-var tileMap = [
-  [[0,1],[8,1],[0,13],[4,1],[0,8],[8,1],[0,5],[4,1],[0,5],[8,1]],
-  [[0,8],[4,1],[0,3],[4,1],[0,6],[8,1],[0,23]],
-  [[0,8],[0,19],[4,1],[0,3],[4,1],[0,6],[8,1],[0,4]],
-  [[0,11],[4,1],[0,12],[4,1],[0,14],[0,6]],
-  [[0,16],[8,1],[0,13],[8,1],[0,11]],
-  [[0,9],[4,1],[0,37]],
-  [[0,48]],
-  [[1,48]]
-];
-/** END **/
-
 Crafty.init(800, 600, document.getElementById('gamecanvas'));
 
 setupGlobalBindings();
@@ -110,7 +91,6 @@ function initialiseGame () {
   });
 }
 
-/** ADD THIS **/
 function loadBackground () {
   var bgColor = shade('#3BB9FF', __STATE.level * 4);
   //Crafty.background(bgColor);
@@ -129,7 +109,6 @@ function shadeColor2(color, percent) {
     var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
     return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
 }
-/** END **/
 
 function loadSprites () {
   Crafty.load(playerSprite);
@@ -245,7 +224,6 @@ function spawnPlayer (){
         this.inDoubleJumpMode = false;
       }
       /* Will need to enable controls in some circumstances */
-      console.log('Enabling control2...');
       if(!__STATE.levelComplete){
         this.enableControl();
       }
@@ -318,7 +296,6 @@ function spawnWalker () {
   Crafty.e('Walker');
 }
 
-/** ADD THIS **/
 /*
   The tilemap generation. Tile level maps are 'pulled' from the tilemap.json
   file which is in the 'runner' directory. You can add as many levels as you
@@ -375,7 +352,6 @@ function processMap(tempMap){
     });
   });
 }
-/** END **/
 
 function displayText () {
   displayScore();
@@ -413,7 +389,6 @@ function displayGameOver(){
     .text("GAME OVER").textColor('#FF0000').textFont({ size: '36px', weight: 'bold', family: 'Courier New' });
 }
 
-/** ADD THIS **/
 function displayLevelComplete(){
   if(Crafty("LevelComplete"))
     Crafty("LevelComplete").destroy();
@@ -422,7 +397,6 @@ function displayLevelComplete(){
     .attr({ x: 270 - Crafty.viewport._x, y: 280, z:100, w: 350 })
     .text("LEVEL "+__STATE.level+" COMPLETE").textColor('#33FF33').textFont({ size: '36px', weight: 'bold', family: 'Courier New' });
 }
-/** END **/
 
 function updateScore(amt){
   __STATE.currentScore += amt;
@@ -456,7 +430,6 @@ function reinstateMovement () {
   }
 }
 
-/** ADD THIS **/
 function reset () {
   _player = null;
   _viewportX = 0;
@@ -510,4 +483,3 @@ Crafty.bind(EVENT_LEVEL_COMPLETE, function(){
     initialiseGame();
   }, 2000, 0);
 })
-/** END **/

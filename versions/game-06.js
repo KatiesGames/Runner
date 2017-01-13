@@ -164,7 +164,6 @@ function spawnPlayer (){
       }
       this.pauseAnimation();
       this.resetAnimation();
-      //this.animate('jump', 1)
       this.sprite(this.currentDirection === RIGHT ? 6 : 2, 4);
     })
     .bind('LandedOnGround', function (ground) {

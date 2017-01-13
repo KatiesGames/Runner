@@ -1,7 +1,8 @@
 /*
-  Title: game-11.js
-  Description: In this version of the code,
-               we are going to create extra background objects
+  Title: staticsun.js
+
+  In this version of the code, we add a static object to the screen, in this case the sun
+  You can change this to any object you like.
 */
 
 /* GLOBAL STATE VARIABLES START WITH A __ */
@@ -11,7 +12,37 @@ var _scoreDisplay = "";
 var _gameStartTime = (new Date()).getTime();
 var _timeLeftDisplay = "";
 var _secondsTotal = 120;
-var _tileMap;
+/** ADD THIS **/
+var _tileMap = [
+  {
+    "level": 1,
+    "map": [
+      [[0,1],[0, 8],[0,13],[0,4],[0,8],[0, 8],[0,5],[0,4],[0,5],[0, 8]],
+      [[0,8],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,23]],
+      [[0,8],[0,19],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,4]],
+      [[0,11],[0,4],[0,12],[0,4],[0,14],[0,6]],
+      [[0,16],[0, 8],[0,13],[0, 8],[0,11]],
+      [[4,1],[0,9],[0,37]],
+      [[0,48]],
+      [[1,48]]
+    ]
+  },
+  {
+    "level": 2,
+    "map": [
+      [[4,1],[0,1],[0,12],[0,1],[0,8],[0,1],[0,5],[0,1],[0,5],[0,1]],
+      [[0,8],[0,1],[0,3],[0,1],[0,6],[0,1],[0,23]],
+      [[0,8],[0,19],[0,1],[0,3],[0,1],[0,6],[0,1],[0,4]],
+      [[0,11],[0,1],[0,12],[0,1],[0,14],[0,6]],
+      [[0,16],[8,1],[0,13],[8,1],[0,11]],
+      [[0,9],[4,1],[0,37]],
+      [[0,48]],
+      [[1,48]]
+    ]
+  }
+]
+
+/** END **/
 
 /* State */
 var __STATE = {};
@@ -44,9 +75,7 @@ Crafty.init(800, 600, document.getElementById('gamecanvas'));
 
 setupGlobalBindings();
 
-/** ADD THIS **/
 var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png', 'img/sun.png']};
-/** END **/
 var playerSprite = { 'sprites': { 'img/playerSprite.png': { tile: 50, tileh: 77, map: { man_left: [0, 1], man_right: [0, 2], jump_right: [6, 4] } } } };
 
 initialiseGame();
@@ -67,8 +96,11 @@ function initialiseGame () {
 
 function loadBackground () {
   var bgColor = shade('#3BB9FF', __STATE.level * 4);
-  Crafty.background(bgColor);
+  //Crafty.background(bgColor);
   //Crafty.background('#FFFFFF url(img/bg.png) repeat-x center center');
+  Crafty.e('BG, 2D, DOM, Image')
+    .attr({ x: 0, y: 0, z: 0, w:3840, h:600 })
+    .image('img/bg.png', 'repeat-x');
 }
 
 function shade(color, percent){
@@ -274,24 +306,19 @@ function spawnWalker () {
   want.
 */
 function generateMap () {
-  fetch("tilemap.json")
-    .then(function(response){
-      return response.json()
-        .then(function(json){
-          json.map(function(tMap, idx){
-            if(tMap.level === __STATE.level){
-              _tileMap = tMap.map;
-              processMap();
-              return;
-            }
-          })
-        })
-    })
+  _tileMap.map(function(lv, idx){
+    if(lv.level === __STATE.level){
+      var tempMap = lv.map;
+      tempMap = lv.map;
+      processMap(tempMap);
+      return;
+    }
+  });
 }
 
-function processMap(){
-  const Y_OFFSET = 600 - (_tileMap.length * TILE_HEIGHT);
-  _tileMap.map(function (tileRow, rowIdx) {
+function processMap(tempMap){
+  const Y_OFFSET = 600 - (tempMap.length * TILE_HEIGHT);
+  tempMap.map(function (tileRow, rowIdx) {
     var xPos = 0;
     var yPos = 0;
     tileRow.map(function (tile, tileIdx) {
@@ -335,7 +362,6 @@ function displayText () {
   displayTimeLeft();
 }
 
-/** ADD THIS **/
 function displaySun () {
   if(Crafty("Sun")){
     Crafty("Sun").destroy();
@@ -345,7 +371,6 @@ function displaySun () {
     .attr({ x: 650 - Crafty.viewport._x, y: 50, z: 0, w: 100, h: 105 })
     .image(Crafty.assets['img/sun.png'].src);
 }
-/** END **/
 
 function displayTimeLeft () {
   if(_timeLeftDisplay){
@@ -402,6 +427,7 @@ function setupGlobalBindings () {
   Crafty.bind(EVENT_GAME_OVER, function(){
     _player.disableControl();
     pauseAndResetAnimation(_player);
+    _player.destroy();
     displayGameOver();
   })
 }
@@ -441,9 +467,10 @@ function reset () {
 Crafty.bind('EnterFrame', function(){
   if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
-/** ADD THIS **/
+
+  /* Display Sun */
   displaySun();
-/** END **/
+
   if(Crafty.frame() % 50 === 1){
     __STATE.timeLeft = _secondsTotal - Math.round(((new Date()).getTime() - _gameStartTime) / 1000);
     if(__STATE.timeLeft <= -1){

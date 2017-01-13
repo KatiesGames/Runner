@@ -164,7 +164,6 @@ function spawnPlayer (){
       }
       this.pauseAnimation();
       this.resetAnimation();
-      //this.animate('jump', 1)
       this.sprite(this.currentDirection === RIGHT ? 6 : 2, 4);
     })
     .bind('LandedOnGround', function (ground) {
@@ -204,7 +203,6 @@ function spawnPlayer (){
         }
       }
     })
-    /** ADD THIS **/
     .checkHits('Platform')
     .bind('HitOn', function(hitData){
       console.log('Hit Platform:', 'x:', hitData[0].obj.x, 'y:', hitData[0].obj.y, 'PlayerX:', this.x, 'PlayerY:', this.y);
@@ -215,7 +213,6 @@ function spawnPlayer (){
       this.velocity().y = 0;
       Crafty.e("Delay").delay(reinstateMovement, 500, 1);
     })
-    /** END ADD THIS **/
     .bind('EnterFrame', function(){
       if(this.x <= -6) this.x = -5;
       if(this.x >= 3785) this.x = 3784;

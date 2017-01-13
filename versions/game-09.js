@@ -21,10 +21,8 @@ __STATE.gameOver = false;
 __STATE.timeLeft = _secondsTotal;
 __STATE.currentScore = 0;
 __STATE.gameOverIsDisplaying = false;
-/** ADD THIS **/
 __STATE.numCoinsToCollect = 0;
 __STATE.levelComplete = false;
-/** END **/
 
 const PLAYER_SPEED = 4;
 const WALKER_VELOCITY = -80;
@@ -32,9 +30,7 @@ const EVENT_PLAYER_DIE = "EVENT_PLAYER_DIE";
 const EVENT_PLAYER_HIT_WALKER = "EVENT_PLAYER_HIT_WALKER";
 const EVENT_PLAYER_HIT_WALL = "EVENT_PLAYER_HIT_WALL";
 const EVENT_GAME_OVER = "EVENT_GAME_OVER";
-/** ADD THIS **/
 const EVENT_LEVEL_COMPLETE = "EVENT_LEVEL_COMPLETE";
-/** END **/
 
 const SCREENWIDTH = 800;
 const SCREENHEIGHT = 600;
@@ -107,10 +103,8 @@ function spawnPlayer (){
     .gravityConst(GRAVITY_STRENGTH)
     .bind('KeyDown',
       function (e) {
-        /** ADD THIS **/
         if(__STATE.levelComplete)
           return;
-        /** END **/
         if (Crafty.keydown['37'] && Crafty.keydown['39']) {
           this.pauseAnimation();
           this.resetAnimation();
@@ -128,10 +122,8 @@ function spawnPlayer (){
     )
     .bind('KeyUp',
       function (e) {
-        /** ADD THIS **/
         if(__STATE.levelComplete)
           return;
-        /** END **/
         if ((this.isPlaying('moveRight') && e.key === Crafty.keys.RIGHT_ARROW) ||
           (this.isPlaying('moveLeft') && e.key === Crafty.keys.LEFT_ARROW)) {
           this.pauseAnimation();
@@ -201,11 +193,9 @@ function spawnPlayer (){
         this.inDoubleJumpMode = false;
       }
       /* Will need to enable controls in some circumstances */
-      /** ADD THIS **/
       if(!__STATE.levelComplete){
         this.enableControl();
       }
-      /** END **/
     })
     .bind('NewDirection', function (obj) {
       /* 0 is neither right nor left so we don't care about it */
@@ -250,11 +240,9 @@ function spawnPlayer (){
       this.vy = -400;
       this.tween({ y: this.y - 100 }, 300);
     })
-    /** ADD THIS **/
     .bind(EVENT_LEVEL_COMPLETE, function () {
       this.disableControl();
     })
-    /** END **/
     .bind('EnterFrame', function(){
       if(this.x <= -6) this.x = -5;
       if(this.x >= 3785) this.x = 3784;
@@ -308,22 +296,16 @@ function generateMap () {
             .setImage('img/platform.png')
             .setPlatform(xPos, yPos, 1)
             .addCoins(Crafty.math.randomInt(1,2));
-          /** ADD THIS **/
           xPos += 160;
-          /** END **/
         }
         else if (tileType === 8) {
           Crafty.e('Platform')
             .setImage('img/platformx2.png')
             .setPlatform(xPos, yPos, 2)
             .addCoins(Crafty.math.randomInt(1,2));
-          /** ADD THIS **/
           xPos += 320;
-          /** END **/
         }
-        /** DELETE THIS **/
         xPos += 80;
-        /** END **/
       }
       if(rowIdx === 6) console.log('x:',xPos,'y:',yPos);
     });
@@ -400,11 +382,9 @@ function pauseAndResetAnimation (ent){
 }
 
 function reinstateMovement () {
-  /** ADD THIS **/
   if(!__STATE.levelComplete){
     _player.enableControl();
   }
-  /** END **/
 }
 
 function reset () {
@@ -420,16 +400,13 @@ function reset () {
   __STATE.timeLeft = _secondsTotal;
   __STATE.currentScore = 0;
   __STATE.gameOverIsDisplaying = false;
-  /** ADD THIS **/
   __STATE.numCoinsToCollect = 0;
   __STATE.levelComplete = false;
-  /** END **/
 
   /* Position viewport */
   Crafty.viewport.scroll('_x', 0)
 }
 
-/** ADD THIS **/
 Crafty.bind('EnterFrame', function(){
   if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
@@ -455,4 +432,3 @@ Crafty.bind(EVENT_LEVEL_COMPLETE, function(){
   __STATE.levelComplete = true;
   displayLevelComplete();
 })
-/** END **/
