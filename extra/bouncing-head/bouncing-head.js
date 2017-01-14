@@ -262,6 +262,9 @@ function spawnPlayer (){
       this.velocity().y = 0;
       Crafty.e("Delay").delay(reinstateMovement, 500, 1);
     })
+    .onHit('Jumpy', function(hitData) {
+      console.log('HIT JUMPY...!');
+    })
     .bind('TweenEnd', function(prop){
       if(this.alpha === 0.0){
         this.destroy();
@@ -281,7 +284,7 @@ function spawnPlayer (){
     .bind('EnterFrame', function(){
       if(this.x <= -6) this.x = -5;
       if(this.x >= 3785) this.x = 3784;
-    })
+    });
 
     /* Set player defaults */
     _player.isJumping = false;
@@ -341,14 +344,16 @@ function processMap(tempMap){
           Crafty.e('Platform')
             .setImage('img/platform.png')
             .setPlatform(xPos, yPos, 1)
-            .addCoins(Crafty.math.randomInt(1,2));
-            xPos += 160;
+            .addCoins(Crafty.math.randomInt(1,2))
+            .addJumpy(true);
+          xPos += 160;
         }
         else if (tileType === 8) {
           Crafty.e('Platform')
             .setImage('img/platformx2.png')
             .setPlatform(xPos, yPos, 2)
-            .addCoins(Crafty.math.randomInt(1,2));
+            .addCoins(Crafty.math.randomInt(1,2))
+            .addJumpy(true);
           xPos += 320;
         }
       }
@@ -360,16 +365,6 @@ function processMap(tempMap){
 function displayText () {
   displayScore();
   displayTimeLeft();
-}
-
-function displaySun () {
-  if(Crafty("Sun")){
-    Crafty("Sun").destroy();
-  }
-
-  Crafty.e('Sun, 2D, DOM, Image')
-    .attr({ x: 650 - Crafty.viewport._x, y: 50, z: 0, w: 100, h: 105 })
-    .image(Crafty.assets['img/sun.png'].src);
 }
 
 function displayTimeLeft () {
@@ -467,9 +462,6 @@ function reset () {
 Crafty.bind('EnterFrame', function(){
   if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
-
-  /* Display Sun */
-  displaySun();
 
   if(Crafty.frame() % 50 === 1){
     __STATE.timeLeft = _secondsTotal - Math.round(((new Date()).getTime() - _gameStartTime) / 1000);

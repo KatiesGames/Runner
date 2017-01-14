@@ -70,7 +70,6 @@ Crafty.c('Walker', {
         /* We need to check this is a genuine collision */
         if(this.getReel().id.match(/dieLeft|dieRight|dieFall/) !== null) return;
         this.velocity().x = 0;
-        //this.x += 5;
         pauseAndResetAnimation(this);
         this.reelPosition(1);
         this.destroy();
