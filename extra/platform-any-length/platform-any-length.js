@@ -19,7 +19,7 @@ var _tileMap = [
     "map": [
       [[0,1],[0, 8],[0,13],[0,4],[0,8],[0, 8],[0,5],[0,4],[0,5],[0, 8]],
       [[0,8],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,23]],
-      [[0,8],[0,19],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,4]],
+      [[4,1],[0,2],[6,1],[0,2],[8,1],[0,2],[10,1],[0,7]], /* CHECKOUT THE DIFFERENT PLATFORM LENGTHS IN THIS LINE */
       [[0,11],[0,4],[0,12],[0,4],[0,14],[0,6]],
       [[0,16],[0, 8],[0,13],[0, 8],[0,11]],
       [[4,1],[0,9],[0,37]],
@@ -75,7 +75,7 @@ Crafty.init(800, 600, document.getElementById('gamecanvas'));
 
 setupGlobalBindings();
 
-var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png', 'img/sun.png']};
+var assets = {'tiles': ['img/tile-1.png', 'img/platform-1.png', 'img/platform-2.png', 'img/platform-3.png', 'img/platform-4.png', 'img/platform-5.png', 'img/sun.png']};
 var playerSprite = { 'sprites': { 'img/playerSprite.png': { tile: 50, tileh: 77, map: { man_left: [0, 1], man_right: [0, 2], jump_right: [6, 4] } } } };
 
 initialiseGame();
@@ -337,19 +337,43 @@ function processMap(tempMap){
         }
       }
       else{
+        /*
+          TODO: CREATE A FUNCTION THAT MAKES THIS NEXT SECTION OF CODE SIMPLER & MORE ROBUST
+         */
         if (tileType === 4) {
           Crafty.e('Platform')
-            .setImage('img/platform.png')
+            .setImage('img/platform-1.png')
             .setPlatform(xPos, yPos, 1)
             .addCoins(Crafty.math.randomInt(1,2));
-            xPos += 160;
+          xPos += 160;
+        }
+        else if (tileType === 6) {
+          Crafty.e('Platform')
+            .setImage('img/platform-2.png')
+            .setPlatform(xPos, yPos, 1.5)
+            .addCoins(Crafty.math.randomInt(1,2));
+          xPos += 240;
         }
         else if (tileType === 8) {
           Crafty.e('Platform')
-            .setImage('img/platformx2.png')
+            .setImage('img/platform-3.png')
             .setPlatform(xPos, yPos, 2)
             .addCoins(Crafty.math.randomInt(1,2));
           xPos += 320;
+        }
+        else if (tileType === 10) {
+          Crafty.e('Platform')
+            .setImage('img/platform-4.png')
+            .setPlatform(xPos, yPos, 2.5)
+            .addCoins(Crafty.math.randomInt(1,2));
+          xPos += 400;
+        }
+        else if (tileType === 12) {
+          Crafty.e('Platform')
+            .setImage('img/platform-5.png')
+            .setPlatform(xPos, yPos, 3)
+            .addCoins(Crafty.math.randomInt(1,2));
+          xPos += 480;
         }
       }
       if(rowIdx === 6) console.log('x:',xPos,'y:',yPos);
@@ -360,16 +384,6 @@ function processMap(tempMap){
 function displayText () {
   displayScore();
   displayTimeLeft();
-}
-
-function displaySun () {
-  if(Crafty("Sun")){
-    Crafty("Sun").destroy();
-  }
-
-  Crafty.e('Sun, 2D, DOM, Image')
-    .attr({ x: 650 - Crafty.viewport._x, y: 50, z: 0, w: 100, h: 105 })
-    .image(Crafty.assets['img/sun.png'].src);
 }
 
 function displayTimeLeft () {
@@ -467,9 +481,6 @@ function reset () {
 Crafty.bind('EnterFrame', function(){
   if(!__STATE.gameStarted || __STATE.levelComplete)
     return;
-
-  /* Display Sun */
-  displaySun();
 
   if(Crafty.frame() % 50 === 1){
     __STATE.timeLeft = _secondsTotal - Math.round(((new Date()).getTime() - _gameStartTime) / 1000);
