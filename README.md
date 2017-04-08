@@ -5,7 +5,7 @@ Initialises the game and loads a background either from a color or an image
 
 ##Game-02.js
 Adds a tilemap. It is worth looking into how this is coded!
-Note also that we need to uncomment the platform.js file in index.html
+NOTE also that we need to uncomment the platform.js file in index.html
 
 ##Game-03.js
 Adds a moveable player from a sprite
@@ -26,7 +26,11 @@ Added the display of text
 Added audio
 Added boundaries to stop player moving off screen
 Added code for the EnterFrame event - ie. the animation loop
+
 ##Game-06.js
+NOTE - You must uncomment walker.js in index.html
+Adds the spawnWalker() function
+
 ##Game-07.js
 ##Game-08.js
 ##Game-09.js

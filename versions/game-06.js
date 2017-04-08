@@ -1,3 +1,10 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>NOTE - You must uncomment walker.js in index.html</p><p>Adds the spawnWalker() function</p><p class='challenge'>Change the walker for your sprite!</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 /* GLOBAL STATE VARIABLES START WITH A __ */
 var _player = null;
 var _viewportX = 0;
