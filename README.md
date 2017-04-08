@@ -19,6 +19,13 @@ Changed background
 Added A LOT of code for player events such as KeyDown, KeyUp, CheckJumping, NewDirection, LandedOnGround
 
 ##Game-05.js
+Added a bunch of global variables plus the full STATE object
+Introduces the concept of events
+Added a reset() method
+Added the display of text
+Added audio
+Added boundaries to stop player moving off screen
+Added code for the EnterFrame event - ie. the animation loop
 ##Game-06.js
 ##Game-07.js
 ##Game-08.js

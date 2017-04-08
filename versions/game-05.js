@@ -1,3 +1,10 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Added a bunch of global variables plus the full STATE object</p><p>Introduces the concept of events</p><p>Added a reset() method</p><p>Added the display of text</p><p>Added audio</p><p>Added boundaries to stop player moving off screen</p><p>Added code for the EnterFrame event - ie. the animation loop</p><p class='challenge'>Can you work out how to change the color/size of the score text?</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 /* GLOBAL STATE VARIABLES START WITH A __ */
 var _player = null;
 var _viewportX = 0;
