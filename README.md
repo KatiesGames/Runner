@@ -12,6 +12,12 @@ Adds a moveable player from a sprite
 Things to look at: gravity, movement, sprite object
 
 ##Game-04.js
+Added constants for SCREENWIDTH and SCREENHEIGHT
+Added constants for RIGHT, LEFT, NONE
+Changed playerSprite to ninja character
+Changed background
+Added A LOT of code for player events such as KeyDown, KeyUp, CheckJumping, NewDirection, LandedOnGround
+
 ##Game-05.js
 ##Game-06.js
 ##Game-07.js

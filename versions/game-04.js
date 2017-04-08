@@ -1,6 +1,6 @@
 // Inject Comments
 window.onload = function() {
-    var gameDescription = "<p>Added constants for SCREENWIDTH and SCREENHEIGHT</p><p>Added constants for RIGHT, LEFT, NONE</p><p>Changed playerSprite to ninja character</p><p>Changed background</p><p>Added A LOT of code for player events such as KeyDown, KeyUp, CheckJumping, NewDirection, LandedOnGround</p>";
+    var gameDescription = "<p>Added constants for SCREENWIDTH and SCREENHEIGHT</p><p>Added constants for RIGHT, LEFT, NONE</p><p>Changed playerSprite to ninja character</p><p>Changed background</p><p>Added A LOT of code for player events such as KeyDown, KeyUp, CheckJumping, NewDirection, LandedOnGround</p><p class='challenge'>Test out all the movement of the character or change it to your character. Can you figure out how to alter the movement?</p>";
 
     document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
 }
