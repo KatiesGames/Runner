@@ -3,7 +3,17 @@
   Description: In this version of the code, we are going to give our
                player a death sequence when he is hit.
 
-*/var _player = null;
+*/
+
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Handles the death of the player better by utilising events EVENT_PLAYER_DIE and EVENT_PLAYER_HIT_WALKER</p><p>Add .onHit event to the Walker</p><p class='challenge'>Can't think of one!</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
+
+var _player = null;
 var _viewportX = 0;
 var _scoreDisplay = "";
 var _gameStartTime = (new Date()).getTime();

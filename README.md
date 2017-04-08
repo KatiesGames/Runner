@@ -35,5 +35,8 @@ Adds the spawnWalker() function
 Add Collision detection with platforms
 
 ##Game-08.js
+Handles the death of the player better by utilising events EVENT_PLAYER_DIE and EVENT_PLAYER_HIT_WALKER
+Add .onHit event to the Walker
+
 ##Game-09.js
 ##Game-10.js
