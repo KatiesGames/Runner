@@ -1,3 +1,10 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Add Collision detection with platforms</p><p class='challenge'>Can't think of one!</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 /* GLOBAL STATE VARIABLES START WITH A __ */
 var _player = null;
 var _viewportX = 0;

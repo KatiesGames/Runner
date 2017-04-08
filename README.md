@@ -32,6 +32,8 @@ NOTE - You must uncomment walker.js in index.html
 Adds the spawnWalker() function
 
 ##Game-07.js
+Add Collision detection with platforms
+
 ##Game-08.js
 ##Game-09.js
 ##Game-10.js
