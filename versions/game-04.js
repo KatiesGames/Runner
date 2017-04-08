@@ -1,3 +1,10 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Added constants for SCREENWIDTH and SCREENHEIGHT</p><p>Added constants for RIGHT, LEFT, NONE</p><p>Changed playerSprite to ninja character</p><p>Changed background</p><p>Added A LOT of code for player events such as KeyDown, KeyUp, CheckJumping, NewDirection, LandedOnGround</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 const SCREENWIDTH = 800;
 const SCREENHEIGHT = 600;
 const TILE_WIDTH = 80;
@@ -6,6 +13,11 @@ const GRAVITY_STRENGTH = 1000;
 const RIGHT = 0;
 const LEFT = 1;
 const NONE = 2;
+
+/* State */
+var __STATE = {};
+__STATE.level = 1;
+__STATE.numCoinsToCollect = -1;
 
 var _player = null;
 
