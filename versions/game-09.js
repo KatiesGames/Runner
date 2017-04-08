@@ -5,6 +5,13 @@
                all the coins.
 */
 
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Quite a lot of updates in this one! Mostly everything in this change is about levels!!</p><p>Added the concept of levels, __STATE.levelComplete = false and EVENT_LEVEL_COMPLETE</p><p>Some updates to the tileMap</p><p>Removed loading of walker sprites</p><p>Add checking if level is complete</p><p>Added gameover when time left is less than 0</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 /* GLOBAL STATE VARIABLES START WITH A __ */
 var _player = null;
 var _viewportX = 0;

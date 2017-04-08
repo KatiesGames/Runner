@@ -39,4 +39,12 @@ Handles the death of the player better by utilising events EVENT_PLAYER_DIE and 
 Add .onHit event to the Walker
 
 ##Game-09.js
+Quite a lot of updates in this one! Mostly everything in this change is about levels!!
+Added the concept of levels, __STATE.levelComplete = false and EVENT_LEVEL_COMPLETE
+Some updates to the tileMap
+Removed loading of walker sprites
+Add checking if level is complete
+Added gameover when time left < 0
+
+
 ##Game-10.js
