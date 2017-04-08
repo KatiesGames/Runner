@@ -46,5 +46,6 @@ Removed loading of walker sprites
 Add checking if level is complete
 Added gameover when time left < 0
 
-
 ##Game-10.js
+Added a dynamic background shade
+Added the 2nd level

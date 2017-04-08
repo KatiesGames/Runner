@@ -4,6 +4,13 @@
                we are going to create a second level
 */
 
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Added a dynamic background shade</p><p>Added the 2nd level</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 /* GLOBAL STATE VARIABLES START WITH A __ */
 var _player = null;
 var _viewportX = 0;
