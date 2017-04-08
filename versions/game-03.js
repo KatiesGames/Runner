@@ -1,6 +1,18 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Adds a moveable player from a sprite</p><p class='challenge'>Can you add in your sprite you have been working on?</p><p class='challenge'>Can you change the gravity and movement?</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 const TILE_WIDTH = 80;
 const TILE_HEIGHT = 60;
 const GRAVITY_STRENGTH = 1000;
+
+/* State */
+var __STATE = {};
+__STATE.level = 1;
+__STATE.numCoinsToCollect = -1;
 
 var _player = null;
 
