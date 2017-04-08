@@ -1,5 +1,18 @@
+// Inject Comments
+window.onload = function() {
+    var gameDescription = "<p>Generates a tilemap</p><p>This is built from an Array variable called 'tileMap'</p><p>NOTE that platform.js should be enabled in index.html but walker.js is not.</p><p class='challenge'>Can you randomize the number of coins per platform?</p>";
+
+    document.getElementsByClassName('sidebar')[0].innerHTML = gameDescription;
+}
+
 const TILE_WIDTH = 80;
 const TILE_HEIGHT = 60;
+
+/* State */
+var __STATE = {};
+__STATE.level = 1;
+__STATE.numCoinsToCollect = -1;
+
 
 var tileMap = [
   [[0,1],[8,1],[0,13],[4,1],[0,8],[8,1],[0,5],[4,1],[0,7],[8,1],[0,6],[8,1],[0,2]],

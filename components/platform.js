@@ -30,8 +30,8 @@ Crafty.c('Platform', {
   },
   addCoins: function (shouldAddCoins) {
     if (shouldAddCoins) {
-      var numCoins = 0;
-      for (var i = 0; i < Crafty.math.randomInt(1, 1 * this.scaleWidth); i++) {
+      var numCoins = Crafty.math.randomInt(1, 1);
+      for (var i = 0; i < numCoins; i++) {
         Crafty.e('2D, DOM, coin_first, SpriteAnimation, Collision')
           .attr({x: this.x + (i * 32) - 1, y: this.y - 80, z: 10})
           .reel('spin', 300, [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]])
@@ -46,8 +46,6 @@ Crafty.c('Platform', {
             }
             this.destroy();
           })
-        /* Add a coin to the total */
-        numCoins++;
       }
       __STATE.numCoinsToCollect += numCoins;
     }
