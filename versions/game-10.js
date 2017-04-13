@@ -23,26 +23,26 @@ var _tileMap = [
   {
     "level": 1,
     "map": [
-      [[0,1],[0, 8],[0,13],[0,4],[0,8],[0, 8],[0,5],[0,4],[0,5],[0, 8]],
       [[0,8],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,23]],
       [[0,8],[0,19],[0,4],[0,3],[0,4],[0,6],[0, 8],[0,4]],
       [[0,11],[0,4],[0,12],[0,4],[0,14],[0,6]],
       [[0,16],[0, 8],[0,13],[0, 8],[0,11]],
       [[4,1],[0,9],[0,37]],
-      [[0,48]],
+      [[0, 48]],
+      [[1,48]],
       [[1,48]]
     ]
   },
   {
     "level": 2,
     "map": [
-      [[4,1],[0,1],[0,12],[0,1],[0,8],[0,1],[0,5],[0,1],[0,5],[0,1]],
       [[0,8],[0,1],[0,3],[0,1],[0,6],[0,1],[0,23]],
       [[0,8],[0,19],[0,1],[0,3],[0,1],[0,6],[0,1],[0,4]],
       [[0,11],[0,1],[0,12],[0,1],[0,14],[0,6]],
       [[0,16],[8,1],[0,13],[8,1],[0,11]],
       [[0,9],[4,1],[0,37]],
-      [[0,48]],
+      [[0, 48]],
+      [[1,48]],
       [[1,48]]
     ]
   }
@@ -64,6 +64,7 @@ const WALKER_VELOCITY = -80;
 const EVENT_PLAYER_DIE = "EVENT_PLAYER_DIE";
 const EVENT_PLAYER_HIT_WALKER = "EVENT_PLAYER_HIT_WALKER";
 const EVENT_PLAYER_HIT_WALL = "EVENT_PLAYER_HIT_WALL";
+const EVENT_PLAYER_SHOOT = "EVENT_PLAYER_SHOOT";
 const EVENT_GAME_OVER = "EVENT_GAME_OVER";
 const EVENT_LEVEL_COMPLETE = "EVENT_LEVEL_COMPLETE";
 const SCREENWIDTH = 800;
@@ -79,8 +80,8 @@ Crafty.init(800, 600, document.getElementById('gamecanvas'));
 
 setupGlobalBindings();
 
-var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png', 'img/sun.png']};
-var playerSprite = { 'sprites': { 'img/playerSprite.png': { tile: 50, tileh: 77, map: { man_left: [0, 1], man_right: [0, 2], jump_right: [6, 4] } } } };
+var assets = {'tiles': ['img/tile-1.png', 'img/cobble1.png', 'img/cobble2.png', 'img/sun.png']};
+var playerSprite = { 'sprites': { 'img/mainCharacter.png': { tile: 64, tileh: 75, map: { man_left: [3,2], man_right: [1, 1], jump_right: [1,0] } } } };
 
 initialiseGame();
 
@@ -104,7 +105,7 @@ function loadBackground () {
   //Crafty.background('#FFFFFF url(img/bg.png) repeat-x center center');
   Crafty.e('BG, 2D, DOM, Image')
     .attr({ x: 0, y: 0, z: 0, w:3840, h:600 })
-    .image('img/bg.png', 'repeat-x');
+    .image('img/Background.png', 'repeat-x');
 }
 
 function shade(color, percent){
@@ -132,15 +133,39 @@ function spawnPlayer (){
       x: 50,
       y: 263
     })
-    .reel('moveRight', 500, [[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2]])
-    .reel('moveLeft', 500, [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1]])
+    .reel('moveRight', 500, [[0, 0],[1, 0],[2, 0],[3, 0],[0, 1]])
+    .reel('moveLeft', 500, [[2, 1],[3, 1],[0, 2],[1, 2],[2, 2],])
     .twoway(200, 510)
     .gravity('FloorTile')
     .gravityConst(GRAVITY_STRENGTH)
+    .bind(EVENT_PLAYER_SHOOT, function () {
+      var bulletX = this.x + 34.5;
+      var bulletY = this.y + 34;
+      var bullet = Crafty.e("Bullet, 2D, DOM, Color, Collision, Motion")
+        .attr({x: bulletX, y: bulletY, w: 8, h: 6 })
+        .color("lightblue")
+        .bind("explode", function(){
+          this.destroy();
+        });
+
+      bullet.onHit('EnemyBullet', (bullets) => {
+        bullet.destroy();
+        bullets.forEach((bullet) => {
+          bullet.obj.destroy();
+        });
+      });
+      bullet.velocity().x = this.currentDirection === RIGHT ? 600 : -600;
+      bullet.velocity().y = 60;
+    })
     .bind('KeyDown',
       function (e) {
         if(__STATE.levelComplete)
           return;
+
+          if (e.key === Crafty.keys.SPACE){
+            Crafty.trigger(EVENT_PLAYER_SHOOT);
+          return;
+          }
 
         if (Crafty.keydown['37'] && Crafty.keydown['39']) {
           this.pauseAnimation();
@@ -215,7 +240,13 @@ function spawnPlayer (){
       this.pauseAnimation();
       this.resetAnimation();
       //this.animate('jump', 1)
-      this.sprite(this.currentDirection === RIGHT ? 6 : 2, 4);
+
+      if (this.currentDirection === RIGHT ) {
+        this.sprite(1, 0);
+      }
+      else if (this.currentDirection === LEFT) {
+        this.sprite(3, 1);
+      }
     })
     .bind('LandedOnGround', function (ground) {
       if (this.isJumping) {
@@ -237,7 +268,10 @@ function spawnPlayer (){
     })
     .bind('NewDirection', function (obj) {
       /* 0 is neither right nor left so we don't care about it */
-      if (obj.x === 0) return;
+      if (obj.x === 0 && !this.isJumping) {
+        this.sprite(0, 3);
+       return;
+      }
       this.currentDirection = obj.x === 1 ? RIGHT : LEFT;
       if (this.currentDirection === RIGHT && !this.isJumping) {
         if (this.isMoving) {
@@ -342,14 +376,14 @@ function processMap(tempMap){
       else{
         if (tileType === 4) {
           Crafty.e('Platform')
-            .setImage('img/platform.png')
+            .setImage('img/cobble1.png')
             .setPlatform(xPos, yPos, 1)
             .addCoins(Crafty.math.randomInt(1,2));
             xPos += 160;
         }
         else if (tileType === 8) {
           Crafty.e('Platform')
-            .setImage('img/platformx2.png')
+            .setImage('img/cobble2.png')
             .setPlatform(xPos, yPos, 2)
             .addCoins(Crafty.math.randomInt(1,2));
           xPos += 320;

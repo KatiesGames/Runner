@@ -29,8 +29,8 @@ var tileMap = [
 
 Crafty.init(800, 600, document.getElementById('gamecanvas'));
 
-var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png']};
-var playerSprite = { 'sprites': { 'img/player.png': { tile: 64, tileh: 75, map: { man_left: [10,0], man_right: [10, 0], jump_right: [9, 0] } } } };
+var assets = {'tiles': ['img/tile-1.png', 'img/cobble1.png', 'img/platformx2.png']};
+var playerSprite = { 'sprites': { 'img/main_charachter.png': { tile: 64, tileh: 75, map: { man_left: [0,0], man_right: [0, 0], jump_right: [1, 0] } } } };
 
 initialiseGame();
 

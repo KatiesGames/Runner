@@ -56,12 +56,12 @@ Crafty.init(800, 600, document.getElementById('gamecanvas'));
 setupGlobalBindings();
 
 var assets = {'tiles': ['img/tile-1.png', 'img/platform.png', 'img/platformx2.png']};
-var playerSprite = { 'sprites': { 'img/playerSprite.png': { tile: 50, tileh: 77, map: { man_left: [0, 1], man_right: [0, 2], jump_right: [6, 4] } } } };
+var playerSprite = { 'sprites': { 'img/main_charachter.png': { tile: 50, tileh: 77, map: { man_left: [0, 0], man_right: [0, 0], jump_right: [1, 0] } } } };
 
 initialiseGame();
 
 function initialiseGame () {
-  Crafty.load(assets, function(){
+  Crafty.load(assets, function(){x
     reset();
     loadBackground();
     loadSprites();

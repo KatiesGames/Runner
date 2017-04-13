@@ -14,7 +14,7 @@ Crafty.c('Walker', {
     }
     if(entryPos === 2){
         this.x = Crafty.viewport._width - Crafty.viewport._x;
-        this.y = -50;
+        this.y = 200;
     }
     if(entryPos === 3){
         this.x = -Crafty.viewport._x - 40;
@@ -51,6 +51,21 @@ Crafty.c('Walker', {
         this.velocity().x = -WALKER_VELOCITY;
     }
     this.gravity('FloorTile');
+    this.onHit('Bullet', function (bullets) {
+      pauseAndResetAnimation(this);
+      var replacementReel = this.getReel().id.replace ('walk', 'die');
+      this.animate(replacementReel, 1);
+      this.velocity().x = 0;
+      this.tween({alpha: 0}, 750);
+      this.bind('TweenEnd', function(){
+        this.destroy();
+      });
+      Crafty.trigger(EVENT_PLAYER_HIT_WALKER);
+
+      bullets.forEach(function (bulletObj) {
+        bulletObj.obj.destroy();
+      });
+    });
     this.onHit('Player', function(hitData) {
       var playerObj = hitData[0].obj;
       if(playerObj.isJumping){
